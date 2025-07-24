@@ -92,8 +92,6 @@ resource "aws_subnet" "sub-pub1" {
   availability_zone = "${var.aws_region}a"
   tags = {
     Name = "sub-pub1"
-    "kubernetes.io/role/elb" = "1"
-    "kubernetes.io/cluster/${var.clusterName}" = "owned"
   }
 }
 
@@ -119,7 +117,7 @@ resource "aws_route_table_association" "public_rt_assoc_sub-pub1" {
 
 resource "aws_network_interface" "public_instance_netw_int" {
   # depends_on =  [resources.aws_subnet.subc, resource.aws_security_group.os_public_proxy_sg]
-  subnet_id   = aws_subnet.suba.id
+  subnet_id   = aws_subnet.sub-pub1.id
   security_groups = [resource.aws_security_group.web-sg.id]
   tags = {
     Name = "primary_network_interface"
