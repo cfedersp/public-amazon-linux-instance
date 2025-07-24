@@ -45,6 +45,13 @@ resource "aws_vpc_security_group_ingress_rule" "s3demo_allow_ssl" {
   ip_protocol       = "tcp"
   to_port           = 443
 }
+resource "aws_vpc_security_group_ingress_rule" "s3demo_allow_console" {
+  security_group_id = aws_security_group.web-sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 8080
+  ip_protocol       = "tcp"
+  to_port           = 8080
+}
 resource "aws_vpc_security_group_ingress_rule" "s3demo_allow_http" {
   security_group_id = aws_security_group.web-sg.id
   cidr_ipv4         = "0.0.0.0/0"
@@ -190,7 +197,7 @@ resource "aws_instance" "public_linux" {
   }
   user_data = <<-EOL
   #!/bin/bash -xe
-  yum install -y java-17-amazon-corretto-headless.x86_64
+  yum install -y java-17-amazon-corretto-headless.x86_64 python3-3.9.16-1.amzn2023.0.2 python3-pip
 
   mkdir -p ${local.data-dir-base}
   mkfs.ext4 ${local.data-ebs-volume1}
