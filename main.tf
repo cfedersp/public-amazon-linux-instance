@@ -22,14 +22,6 @@ resource "aws_vpc" "main" {
     Name = "main"
   }
 }
-resource "aws_security_group" "web-sg" {
-  name        = "${resource.aws_vpc.main.id}-ssh-eks"
-  description = "SSH into EKS"
-  vpc_id      = resource.aws_vpc.main.id
-  tags = {
-    Name = "${resource.aws_vpc.main.id}-ssh-eks"
-  }
-}
 resource "aws_vpc_security_group_ingress_rule" "eks_allow_ssh" {
   security_group_id = aws_security_group.web-sg.id
   cidr_ipv4         = "0.0.0.0/0"
@@ -158,24 +150,24 @@ resource "aws_iam_policy" "s3_admin_policy" {
     ]
   })
 }
-resource "aws_iam_role" "public_s3handler_role" {
-  name               = "public_s3handler_role"
+resource "aws_iam_role" "public_instance_role" {
+  name               = "public_instance_role"
   assume_role_policy = data.aws_iam_policy_document.public_s3handler_assume_role_policy.json
 }
-resource "aws_iam_group" "s3handler_iamgroup" {
+resource "aws_iam_group" "instance_iamgroup" {
   name = "test-group"
 }
-resource "aws_iam_group_policy_attachment" "s3handler-iam-attach" {
-  group      = aws_iam_group.s3handler_iamgroup.name
+resource "aws_iam_group_policy_attachment" "instance-iam-attach" {
+  group      = aws_iam_group.instance_iamgroup.name
   policy_arn = aws_iam_policy.s3_admin_policy.arn
 }
 resource "aws_iam_role_policy_attachment" "test-attach" {
-  role       = aws_iam_role.public_s3handler_role.name
+  role       = aws_iam_role.public_instance_role.name
   policy_arn = aws_iam_policy.s3_admin_policy.arn
 }
-resource "aws_iam_instance_profile" "public_s3handler_profile" {
-  name = "public_s3handler_profile"
-  role = aws_iam_role.public_s3handler_role.name
+resource "aws_iam_instance_profile" "public_instance_profile" {
+  name = "public_instance_profile"
+  role = aws_iam_role.public_instance_role.name
 }
 locals {
   data-ebs-volume1 = "/dev/xvdb"
@@ -183,11 +175,11 @@ locals {
 
 }
 resource "aws_instance" "public_linux" {
-  ami           = var.s3handler_ami
+  ami           = var.instance_ami
   availability_zone = "${var.aws_region}a"
   instance_type = "t2.micro"
   key_name = var.ssh_key_pair
-  iam_instance_profile = "public_s3handler_profile"
+  iam_instance_profile = "public_instance_profile"
   user_data_replace_on_change = "true"
   root_block_device {
     encrypted = true
