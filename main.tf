@@ -117,7 +117,7 @@ resource "aws_route_table_association" "public_rt_assoc_sub-pub1" {
 }
 
 
-resource "aws_network_interface" "public_s3handler" {
+resource "aws_network_interface" "public_instance_netw_int" {
   # depends_on =  [resources.aws_subnet.subc, resource.aws_security_group.os_public_proxy_sg]
   subnet_id   = aws_subnet.suba.id
   security_groups = [resource.aws_security_group.web-sg.id]
@@ -126,7 +126,7 @@ resource "aws_network_interface" "public_s3handler" {
   }
 }
 
-data "aws_iam_policy_document" "public_s3handler_assume_role_policy" {
+data "aws_iam_policy_document" "public_instance_assume_role_policy" {
   statement {
     actions = ["sts:AssumeRole"]
 
@@ -152,7 +152,7 @@ resource "aws_iam_policy" "s3_admin_policy" {
 }
 resource "aws_iam_role" "public_instance_role" {
   name               = "public_instance_role"
-  assume_role_policy = data.aws_iam_policy_document.public_s3handler_assume_role_policy.json
+  assume_role_policy = data.aws_iam_policy_document.public_instance_assume_role_policy.json
 }
 resource "aws_iam_group" "instance_iamgroup" {
   name = "test-group"
@@ -193,7 +193,7 @@ resource "aws_instance" "public_linux" {
     volume_type = "gp3"
   }
   network_interface {
-    network_interface_id = aws_network_interface.public_s3handler.id
+    network_interface_id = aws_network_interface.public_instance_netw_int.id
     device_index         = 0
   }
   metadata_options {
