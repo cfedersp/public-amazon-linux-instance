@@ -19,3 +19,7 @@ variable "instance_ami" {
   description = "AMI"
   type = string
 }
+variable "ec2_instance_type" {
+  description = "instance type"
+  type = string
+}

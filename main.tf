@@ -166,7 +166,7 @@ locals {
 resource "aws_instance" "public_linux" {
   ami           = var.instance_ami
   availability_zone = "${var.aws_region}a"
-  instance_type = "t2.micro"
+  instance_type = var.ec2_instance_type
   key_name = var.ec2_key_pair
   iam_instance_profile = "public_instance_profile"
   user_data_replace_on_change = "true"
