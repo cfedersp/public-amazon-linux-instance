@@ -38,13 +38,6 @@ resource "aws_security_group" "web-sg" {
     Name = "${resource.aws_vpc.main.id}-web-sg"
   }
 }
-resource "aws_vpc_security_group_ingress_rule" "eks_allow_web" {
-  security_group_id = aws_security_group.web-sg.id
-  cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 80
-  ip_protocol       = "tcp"
-  to_port           = 80
-}
 resource "aws_vpc_security_group_ingress_rule" "s3demo_allow_ssl" {
   security_group_id = aws_security_group.web-sg.id
   cidr_ipv4         = "0.0.0.0/0"
@@ -74,8 +67,6 @@ resource "aws_vpc_security_group_egress_rule" "s3demo_allow_http_out" {
   ip_protocol       = "tcp"
   to_port           = 80
 }
-
-
 
 resource "aws_internet_gateway" "internet" {}
 
